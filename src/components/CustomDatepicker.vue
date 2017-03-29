@@ -11,13 +11,15 @@
     </header>
     <section>
       <div class="cd-weekdays">
-        <span v-for="weekday in weekdays">
+        <article v-for="weekday in weekdayLabels">
           {{ weekday }}
-        </span>
+        </article>
       </div>
-<!--       <div class="day" v-for="day,index in dayList" :key="index" @click="checkDay(day)" :class="{'checked':day.checked,'unavailable':day.unavailable,'passive-day': !(day.inMonth)}" :style="day.checked ? (option.color && option.color.checkedDay ? { background: option.color.checkedDay } : { background: '#F50057' }) : {}">
-        {{day.value}}
-      </div> -->
+      <div class="cd-days">
+        <article v-for="day,i in daysConstructor" :key="i" :class="{disabled:!day.currentMonth}">
+          {{ day.num }}
+        </article>
+      </div>
     </section>
     <footer>
  <!--      <span @click="showInfo.check=false">{{option.buttons? option.buttons.cancel : 'Cancel' }}</span>
@@ -47,11 +49,48 @@ export default {
   data() {
     return {
       currentMoment: moment(),
-      weekdays: ['m', 't', 'w', 't', 'f', 's', 's']
+      weekdayLabels: ['m', 't', 'w', 't', 'f', 's', 's']
     }
   },
   computed: {
+    firstDayWeekday() {
+      return moment(this.currentMoment).date(1).day() - 1
+    },
+    daysConstructor() {
+      const firstDayOffset = moment(this.currentMoment).date(1).day() - 2,
+            prevMonth = moment(this.currentMoment).add(-1, 'months'),
+            daysInCurrentMonth = moment(this.currentMoment).endOf('month').date(),
+            daysInPrevMonth = prevMonth.endOf('month').date()
 
+            
+      let days = [],
+          currentDay = firstDayOffset >= 0 ? daysInPrevMonth - firstDayOffset : (firstDayOffset == -2 ? daysInPrevMonth - 5 : 1),
+          prevMonthPassed = firstDayOffset < 0 && firstDayOffset !== -2,
+          currentMonthPassed = false
+
+      debugger;
+
+      for (let i = 0; i < 42; i++) {
+        const dayObj = { num:currentDay, currentMonth:(prevMonthPassed && !currentMonthPassed) }
+        days.push(dayObj)
+        if (prevMonthPassed) {
+          if (currentDay >= daysInCurrentMonth) {
+            currentDay = 1
+            currentMonthPassed = true;
+          } else {
+            currentDay += 1
+          }
+        } else {  
+          if (currentDay >= daysInPrevMonth) {
+            currentDay = 1
+            prevMonthPassed = true;
+          } else {
+            currentDay += 1
+          }
+        }
+      }
+      return days
+    }
   },
   methods: {
     incrementMonth(num) {
@@ -62,16 +101,13 @@ export default {
 </script>
 <style lang="scss">
 .cd-wrapper {
-  width: 400px;
+  width: 350px;
   display: block;
   margin: auto;
   border-radius: 2px;
 }
 
 .cd-weekdays {
-  display: flex;
-  justify-content: space-between;
-  padding: 15px 25px;
   text-transform: uppercase;
   background: rgb(9, 24, 188);
   color: white;
@@ -80,12 +116,32 @@ export default {
 header {
   background: #0012ee;
   color: white;
+  text-transform: uppercase;
+  letter-spacing: 2px;
   padding: 1em;
   display: flex;
   align-items: center;
   justify-content: space-between;
   > svg {
     cursor: pointer;
+  }
+}
+
+.cd-days, .cd-weekdays {
+  padding: 5px 25px;
+  > article {
+    width: 14.2857143%;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+    height: 40px;
+    padding: 0;
+    line-height: 40px;
+    vertical-align: middle;
+    &.disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
   }
 }
 </style>
