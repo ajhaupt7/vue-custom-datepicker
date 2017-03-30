@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <custom-datepicker />
+    <custom-datepicker initialDate="2017-04-15"/>
   </div>
 </template>
 
