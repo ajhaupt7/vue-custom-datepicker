@@ -25,5 +25,21 @@
     "vue-template-compiler": "^2.2.1",
     "webpack": "^2.2.0",
     "webpack-dev-server": "^2.2.0"
-  }
+  },
+  "main": "CustomDatepicker.vue",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajhaupt7/vue-custom-datepicker.git"
+  },
+  "keywords": [
+    "datepicker",
+    "vue",
+    "calendar",
+    "cal"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ajhaupt7/vue-custom-datepicker/issues"
+  },
+  "homepage": "https://github.com/ajhaupt7/vue-custom-datepicker#readme"
 }
