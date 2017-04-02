@@ -1,39 +1,51 @@
 <template>
-  <div class="cd-wrapper" :style="wrapperStyles">
-  {{ selectedDate.format('YYYY-MM-DD') }}
-    <header :style="headerStyles">
-      <button>
-        <figure class="chevron left" @click="incrementMonth($event, -1)"></figure>
-      </button>
-      <article>
-        <span>{{ displayDate.format('MMMM') }}</span> <span>{{ displayDate.format('Y') }}</span>
-      </article>
-      <button>
-        <figure class="chevron right" @click="incrementMonth($event, 1)"></figure>
-      </button>
-    </header>
-    <section>
-      <div class="cd-weekdays" :style="weekdayStyles">
-        <article v-for="weekday in weekdayLabels">
-          {{ weekday }}
+  <div class="cd-wrapper" :style="wrapperStyles" v-if="!modal || modalActive">
+    <div class="cd-body-wrapper">
+      <header :style="allHeaderStyles">
+        <button>
+          <figure class="chevron left" @click="incrementMonth($event, -1)"></figure>
+        </button>
+        <article>
+          <span>{{ displayDate.format('MMMM') }}</span> <span>{{ displayDate.format('Y') }}</span>
         </article>
-      </div>
-      <div class="cd-days" :style="bodyStyles">
-        <button 
-          v-for  = "day,i in daysTest" 
-          :key   = "i" 
-          :class = "{ disabled: day.disabled, 'active-date': activeDate(day), today: isToday(day) }"
-          @click = "selectDate($event, day)"
-        >
-          <span>{{ day.format('D') }}</span>
+        <button>
+          <figure class="chevron right" @click="incrementMonth($event, 1)"></figure>
+        </button>
+      </header>
+      <section>
+        <div class="cd-weekdays" :style="allWeekdayStyles">
+          <article v-for="weekday in weekdayLabels">
+            {{ weekday }}
+          </article>
+        </div>
+        <div class="cd-days" :style="bodyStyles">
+          <button 
+            v-for  = "day,i in daysTest" 
+            :key   = "i" 
+            :style = "dayStyle(day)"
+            :class = "{ disabled: day.disabled, active: day.active }"
+            @click = "selectDate($event, day)"
+          >
+            <span>{{ day.format('D') }}</span>
+            <figure :style="{ background: activeDateBackgroundColor }"></figure>
+          </button>
+        </div>
+      </section>
+      <footer v-if="modal">
+        <button>
+          <svg viewBox="0 0 800 800">
+            <path d="M274.9 279l242 242m8.1-242L283 521" class="st0" style="stroke:#e00202"/>
+          </svg>
           <figure></figure>
         </button>
-      </div>
-    </section>
-    <footer>
- <!--      <span @click="showInfo.check=false">{{option.buttons? option.buttons.cancel : 'Cancel' }}</span>
-      <span @click="picked">{{option.buttons? option.buttons.ok : 'Ok'}}</span> -->
-    </footer>
+        <button @click="picked">
+          <svg viewBox="0 0 800 800">
+            <path d="M578.5 235.5l-237 302m-80-112l80 112" class="st0" style="stroke:#26c14a"/>
+          </svg>
+          <figure></figure>
+        </button>
+      </footer>
+    </div>
   </div>
 </template>
 <script>
@@ -55,29 +67,49 @@ export default {
         return "#ff5a5f"
       }
     },
-    width: {
-      type: Number,
+    primaryTextColor: {
+      type: String,
       default() {
-        return 350
-      } 
+        return "white"
+      }
     },
-    headerStyles: {
+    wrapperStyles: {
       type: Object,
       default() {
         return {
-          background: this.primaryColor,
-          color: "white"
+          width: '350px'
         }
+      } 
+    },
+    headerBackgroundColor: {
+      type: String,
+      default() {
+        return this.primaryColor
+      }
+    },
+    headerTextColor: {
+      type: String,
+      default() {
+        return this.primaryTextColor
+      }
+    },
+    headerStyles: {
+      type: Object
+    },
+    weekdayBackgroundColor: {
+      type: String,
+      default() {
+        return shadeColor(this.primaryColor, 0.15)
+      }
+    },
+    weekdayTextColor: {
+      type: String,
+      default() {
+        return this.primaryTextColor
       }
     },
     weekdayStyles: {
-      type: Object,
-      default() {
-        return {
-          background: shadeColor(this.primaryColor, 0.15),
-          color: "white"
-        }
-      }
+      type: Object
     },
     bodyStyles: {
       type: Object,
@@ -88,11 +120,36 @@ export default {
         }
       }
     },
+    activeDateBackgroundColor: {
+      type: String,
+      default() {
+        return this.primaryColor
+      }
+    },
+    activeDateTextColor: {
+      type: String,
+      default() {
+        return this.primaryTextColor
+      }
+    },
+    todayTextColor: {
+      type: String,
+      default() {
+        return this.primaryColor
+      }
+    },
+    modal: {
+      type: Boolean,
+      default() {
+        return false
+      }
+    }
   },
   data() {
     return {
       displayDate: moment(this.initialDate),
       selectedDate: moment(this.initialDate),
+      modalDate: moment(this.initialDate),
       today: moment(),
       weekdayLabels: ['m', 't', 'w', 't', 'f', 's', 's']
     }
@@ -105,7 +162,9 @@ export default {
       for (let i = 0; i < 42; i++) {
         const dayMoment = moment(currentDay)
         const properties = {
-          disabled: dayMoment.month() !== this.displayDate.month()
+          disabled: dayMoment.month() !== this.displayDate.month(),
+          active: dayMoment.format('YYYY-MM-DD') === moment(this.selectedDate).format('YYYY-MM-DD'),
+          today: dayMoment.format('YYYY-MM-DD') === this.today.format('YYYY-MM-DD')
         }
         
         const dayObj = Object.assign(dayMoment, properties)
@@ -114,34 +173,33 @@ export default {
       }
       return days
     },
-    wrapperStyles() {
-      return { width: `${this.width}px` }
+    allHeaderStyles() {
+      return Object.assign({
+        background: this.headerBackgroundColor,
+        color: this.headerTextColor,
+      }, this.headerStyles)
+    },
+    allWeekdayStyles() {
+      return Object.assign({
+        background: this.weekdayBackgroundColor,
+        color: this.weekdayTextColor,
+      }, this.weekdayStyles)
     }
   },
   methods: {
     incrementMonth(e, num) {
       this.displayDate = moment(this.displayDate).add(num, 'months')
-      const button = event.target.closest("button")
-      button.classList.add('pulse')
-      setTimeout(() => {
-        button.classList.remove('pulse')
-      }, 1200);
     },
     selectDate(e, day) {
-      const button = event.target.closest("button")
-      if (!day.disabled) {
-        this.selectedDate = day
-        button.classList.add('pulse')
-        setTimeout(() => {
-          button.classList.remove('pulse')
-        }, 1200);
-      }
+      if (!day.disabled) this.selectedDate = day
+      this.$emit('dateSelected', this.selectedDate.format('YYYY-MM-DD'))
     },
-    activeDate(day) {
-      return day.format('YYYY-MM-DD') === moment(this.selectedDate).format('YYYY-MM-DD')
-    },
-    isToday(day) {
-      return day.format('YYYY-MM-DD') === this.today.format('YYYY-MM-DD')
+    dayStyle(day) {
+      let styles = {}
+      if (day.today) styles = { color: this.todayTextColor }
+      if (day.active) styles = { color: this.activeDateTextColor }
+
+      return styles
     }
   }
 }
@@ -153,8 +211,12 @@ $primary-color: #ff5a5f;
   width: 350px;
   display: block;
   margin: auto;
-  border-radius: 2px;
   font-family: inherit;
+}
+
+.cd-body-wrapper {
+  overflow: hidden;
+  border-radius: 2px;
 }
 
 .cd-weekdays {
@@ -186,19 +248,11 @@ header {
     margin: 0;
     height: 25px;
     width: 25px;
-    > figure {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      border-radius: 100%;
-    }
     &:first-child {
-      left: 15px;
+      left: 25px;
     }
     &:last-child {
-      right: 15px;
+      right: 25px;
     }
   }
 }
@@ -225,6 +279,9 @@ header {
 .cd-weekdays {
   font-size: 0.9em;
   font-weight: bold;
+  > article {
+    cursor: default;
+  }
 }
 
 .cd-days {
@@ -244,32 +301,31 @@ header {
       border-radius: 100%;
       border:none;
       position: absolute;
-      top:1.5px;
-      left:47%;
-      transform: translateX(-50%) scale(0.4);
+      top:50%;
+      left:47.5%;
+      transform: translate3d(-50%,-50%,0) scale(0.4);
       opacity: 0;
     }
     &.disabled {
       opacity: 0.4;
       cursor: default;
     }
-    &.active-date {
+    &.active {
       color: white;
       > figure {
         background: $primary-color;
-        transform: translateX(-50%) scale(1);
+        transform: translate3d(-50%,-50%,0) scale(1);
         opacity: 1;
       }
     }
-    &:hover:not(.active-date):not(.disabled) {
+    &:hover:not(.active):not(.disabled) {
       color: white;
       > figure {
-        background: rgba($primary-color, 0.6);
-        transform: translateX(-50%) scale(1);
-        opacity: 1;
+        transform: translate3d(-50%,-50%,0) scale(1);
+        opacity: 0.6;
       }
     }
-    &.today:not(.active-date) {
+    &.today:not(.active) {
       color: $primary-color;
     }
   }
@@ -280,13 +336,13 @@ header {
   border-width: 0.05em 0.05em 0 0;
   content: '';
   display: inline-block;
-  height: 0.45em;
+  height: 0.5em;
+  width: 0.5em;
   left: 0;
   position: relative;
   top: 0;
   transform: rotate(-45deg);
   vertical-align: top;
-  width: 0.45em;
 }
 
 .chevron.right:before {
@@ -324,8 +380,14 @@ button {
 button {
   > figure {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 100%;
     &:after {
-      background: rgba(0, 0, 0, 0.1);
+      background: rgba(0, 0, 0, 0.15);
       content: "";
       width: 100%;
       height: 100%;
@@ -338,9 +400,9 @@ button {
       visibility: hidden;
     }
   }
-  &.pulse {
+  &:focus, &:active {
     > figure:after {
-      animation: pulse 400ms ease-in-out forwards;
+      animation: pulse 500ms ease-in-out forwards;
     }
   }
 }
@@ -357,7 +419,26 @@ button {
     transform: scale3d(1.4, 1.4, 1);
   }
 }
+
 figure {
   margin: 0;
 }
+
+footer {
+  button {
+    position: relative;
+    cursor: pointer;
+  }
+  figure {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  svg, figure {
+    width: 50px;
+    height: 50px;
+    .st0{fill:none;stroke:#000000;stroke-width:35;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+  }
+}
+
 </style>

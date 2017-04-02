@@ -1,6 +1,17 @@
 <template>
   <div id="app">
-    <custom-datepicker initialDate="2017-04-15"/>
+    <h2>{{ selectedDate }}</h2>
+    <custom-datepicker 
+      @dateSelected     = "setDate($event)"
+      :initialDate      = "selectedDate" 
+      :primaryColor     = "primaryColor"
+      :primaryTextColor = "primaryTextColor"
+      :todayTextColor   = "todayTextColor"
+      :activeDateTextColor   = "activeDateTextColor"
+      :activeDateBackgroundColor = "activeDateBackgroundColor"
+      :modal = "modal"
+      :modalActive = "modalActive"
+    />
   </div>
 </template>
 
@@ -11,7 +22,20 @@ export default {
   components: { CustomDatepicker },
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      selectedDate: "2017-04-15",
+      wrapperStyles: { width: '325px' },
+      primaryColor: "#fff",
+      primaryTextColor: "black",
+      todayTextColor: "#0918bc",
+      activeDateTextColor: "#fff",
+      activeDateBackgroundColor: "#0918bc",
+      modal: true,
+      modalActive: false
+    }
+  },
+  methods: {
+    setDate(date) {
+      this.selectedDate = date
     }
   }
 }
@@ -19,7 +43,7 @@ export default {
 
 <style lang="scss">
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Cabin', monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
