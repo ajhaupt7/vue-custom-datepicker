@@ -1,5 +1,5 @@
 <template>
-  <div class="cd-wrapper" :style="wrapperStyles" v-if="!modal || modalActive">
+  <div class="cd-wrapper" :style="wrapperStyles">
     <div class="cd-body-wrapper">
       <header :style="allHeaderStyles">
         <button>
@@ -31,20 +31,21 @@
           </button>
         </div>
       </section>
-      <footer v-if="modal">
+<!--  May add support for modals later     
+      <footer>
         <button>
           <svg viewBox="0 0 800 800">
             <path d="M274.9 279l242 242m8.1-242L283 521" class="st0" style="stroke:#e00202"/>
           </svg>
           <figure></figure>
         </button>
-        <button @click="picked">
+        <button>
           <svg viewBox="0 0 800 800">
             <path d="M578.5 235.5l-237 302m-80-112l80 112" class="st0" style="stroke:#26c14a"/>
           </svg>
           <figure></figure>
         </button>
-      </footer>
+      </footer> -->
     </div>
   </div>
 </template>
@@ -137,19 +138,12 @@ export default {
       default() {
         return this.primaryColor
       }
-    },
-    modal: {
-      type: Boolean,
-      default() {
-        return false
-      }
     }
   },
   data() {
     return {
       displayDate: moment(this.initialDate),
       selectedDate: moment(this.initialDate),
-      modalDate: moment(this.initialDate),
       today: moment(),
       weekdayLabels: ['m', 't', 'w', 't', 'f', 's', 's']
     }
