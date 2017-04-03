@@ -4,8 +4,8 @@
       <header :style="allHeaderStyles">
         <button>
           <figure class="chevron left" @click="incrementMonth($event, -1)"></figure>
-        </button>
-        <article>
+        </button> 
+        <article data-transition="month-change">
           <span>{{ displayDate.format('MMMM') }}</span> <span>{{ displayDate.format('Y') }}</span>
         </article>
         <button>
@@ -13,12 +13,12 @@
         </button>
       </header>
       <section>
-        <div class="cd-weekdays" :style="allWeekdayStyles">
+        <div class="cd-weekdays" id="cd-day-select" :style="allWeekdayStyles">
           <article v-for="weekday in weekdayLabels">
             {{ weekday }}
           </article>
         </div>
-        <div class="cd-days" :style="bodyStyles">
+        <div class="cd-days" :style="bodyStyles" data-transition="month-change">
           <button 
             v-for  = "day,i in daysConstructor" 
             :key   = "i" 
@@ -196,7 +196,15 @@ export default {
   },
   methods: {
     incrementMonth(e, num) {
-      this.displayDate = moment(this.displayDate).add(num, 'months')
+      const transitions = document.querySelectorAll('[data-transition="month-change"]')
+      const animation = num > 0 ? 'animate-next' : 'animate-prev'
+      transitions.forEach(transition => transition.classList.add(animation))
+      setTimeout(() => {
+        this.displayDate = moment(this.displayDate).add(num, 'months')
+      }, 200);
+      setTimeout(() => {
+        transitions.forEach(transition => transition.classList.remove(animation))
+      }, 400);
     },
     selectDate(e, day) {
       if (!day.disabled) this.selectedDate = day
@@ -291,8 +299,10 @@ header {
       right: 25px;
     }
   }
-  > article > span:first-child {
-    font-weight: bold;
+  > article {
+    > span:first-child {
+      font-weight: bold;
+    }
   }
 }
 .cd-days {
@@ -334,7 +344,7 @@ header {
       color: $white;
       > figure {
         background: $primary_color;
-          transform: translate3d(-50%, -50%, 0) scale(1);
+        transform: translate3d(-50%, -50%, 0) scale(1);
         opacity: 1;
       }
     }
@@ -423,18 +433,6 @@ button {
     }
   }
 }
-@keyframes pulse {
-  0% {
-    visibility: visible;
-    opacity: 1;
-    transform: scale3d(1, 1, 1);
-  }
-  100% {
-    visibility: visible;
-    opacity: 0;
-    transform: scale3d(1.4, 1.4, 1);
-  }
-}
 figure {
   margin: 0;
 }
@@ -469,6 +467,44 @@ footer {
       stroke-linejoin: round;
       stroke-miterlimit: 10;
     }
+  }
+}
+* {
+  &.animate-next {
+    animation: monthChange 400ms cubic-bezier(0.6, 0.18, 0.42, 1.25) normal forwards;
+  }
+  &.animate-prev {
+    animation: monthChange 400ms cubic-bezier(0.6, 0.18, 0.42, 1.25) reverse forwards;
+  }
+}
+@keyframes pulse {
+  0% {
+    visibility: visible;
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+  100% {
+    visibility: visible;
+    opacity: 0;
+    transform: scale3d(1.4, 1.4, 1);
+  }
+}
+@keyframes monthChange {
+  0% {
+    opacity: 1;
+    transform: translate3d(0,0,0);
+  }
+  40% {
+    opacity: 0;
+    transform: translate3d(30%,0,0);
+  }
+  60% {
+    opacity: 0;
+    transform: translate3d(-30%,0,0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0,0,0);
   }
 }
 </style>
