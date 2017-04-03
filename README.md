@@ -15,11 +15,15 @@
 $ npm install vue-custom-datepicker
 ```
 
-![Screenshot](screenshot.png)
+<img src="./assets/screenshot.png" width="300" />
 
 ## Usage
 
 - Emits `dateSelected` event that returns the formatted date
+- Prop `primaryColor` will set the colors for the current date and the day selection
+- Each element (i.e. header, body, weekdays, etc.) can be changed individually through the relevant style prop
+- Min and max dates can be set in the `limits` prop
+- Date can be formatted in any format that <a href="https://momentjs.com/">Moment</a> can handle
 
 ```html
 <template>
