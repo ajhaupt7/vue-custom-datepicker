@@ -20,7 +20,7 @@
         </div>
         <div class="cd-days" :style="bodyStyles">
           <button 
-            v-for  = "day,i in daysTest" 
+            v-for  = "day,i in daysConstructor" 
             :key   = "i" 
             :style = "dayStyle(day)"
             :class = "{ disabled: day.disabled, active: day.active }"
@@ -55,10 +55,25 @@ import {shadeColor} from './helpers'
 
 export default {
   props: {
-    initialDate: {
+    date: {
       type: String,
       default() {
         return moment()
+      }
+    },
+    limits: {
+      type: Object,
+      default() {
+        return {
+          start: null,
+          end: null
+        }
+      }
+    },
+    dateFormat: {
+      type: String,
+      default() {
+        return 'YYYY-MM-DD'
       }
     },
     primaryColor: {
@@ -141,23 +156,23 @@ export default {
   },
   data() {
     return {
-      displayDate: moment(this.initialDate),
-      selectedDate: moment(this.initialDate),
+      displayDate: moment(this.date),
+      selectedDate: moment(this.date),
       today: moment(),
       weekdayLabels: ['m', 't', 'w', 't', 'f', 's', 's']
     }
   },
   computed: {
-    daysTest() {
+    daysConstructor() {
       let days = [],
           currentDay = moment(this.displayDate).startOf('month').day(1)
 
       for (let i = 0; i < 42; i++) {
         const dayMoment = moment(currentDay)
         const properties = {
-          disabled: dayMoment.month() !== this.displayDate.month(),
-          active: dayMoment.format('YYYY-MM-DD') === moment(this.selectedDate).format('YYYY-MM-DD'),
-          today: dayMoment.format('YYYY-MM-DD') === this.today.format('YYYY-MM-DD')
+          disabled: this.isDisabled(dayMoment),
+          active: dayMoment.format(this.dateFormat) === moment(this.selectedDate).format(this.dateFormat),
+          today: dayMoment.format(this.dateFormat) === this.today.format(this.dateFormat)
         }
         
         const dayObj = Object.assign(dayMoment, properties)
@@ -185,7 +200,7 @@ export default {
     },
     selectDate(e, day) {
       if (!day.disabled) this.selectedDate = day
-      this.$emit('dateSelected', this.selectedDate.format('YYYY-MM-DD'))
+      this.$emit('dateSelected', this.selectedDate.format(this.dateFormat))
     },
     dayStyle(day) {
       let styles = {}
@@ -193,6 +208,13 @@ export default {
       if (day.active) styles = { color: this.activeDateTextColor }
 
       return styles
+    },
+    isDisabled(dayMoment) {
+      const notWithinLimits = moment(this.limits.start).diff(dayMoment, 'days') > 0
+          || moment(this.limits.end).diff(dayMoment, 'days') < 0
+      const notCurrentMonth = dayMoment.month() !== this.displayDate.month()
+
+      return notWithinLimits || notCurrentMonth
     }
   }
 }
