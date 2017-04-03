@@ -51,7 +51,7 @@
 </template>
 <script>
 import moment from 'moment'
-import {shadeColor} from '../helpers'
+import {shadeColor} from './helpers'
 
 export default {
   name: 'custom-datepicker',
