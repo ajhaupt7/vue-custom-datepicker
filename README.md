@@ -66,7 +66,7 @@ export default {
 
 ## API 
 
-```
+```javascript
 initialDate: {
   type: String,
   default() {
