@@ -1,7 +1,7 @@
 <template>
   <div class="cd-wrapper" :style="wrapperStyles">
     <div class="cd-body-wrapper">
-      <header :style="allHeaderStyles">
+      <header :style="headerStyles">
         <button>
           <figure class="chevron left" @click="incrementMonth($event, -1)"></figure>
         </button> 
@@ -13,7 +13,7 @@
         </button>
       </header>
       <section>
-        <div class="cd-weekdays" id="cd-day-select" :style="allWeekdayStyles">
+        <div class="cd-weekdays" id="cd-day-select" :style="weekdayStyles">
           <article v-for="weekday in weekdayLabels">
             {{ weekday }}
           </article>
@@ -82,58 +82,17 @@ export default {
         return "#ff5a5f"
       }
     },
-    primaryTextColor: {
-      type: String,
-      default() {
-        return "white"
-      }
-    },
     wrapperStyles: {
-      type: Object,
-      default() {
-        return {
-          width: '350px'
-        }
-      } 
-    },
-    headerBackgroundColor: {
-      type: String,
-      default() {
-        return this.primaryColor
-      }
-    },
-    headerTextColor: {
-      type: String,
-      default() {
-        return this.primaryTextColor
-      }
+      type: Object 
     },
     headerStyles: {
       type: Object
-    },
-    weekdayBackgroundColor: {
-      type: String,
-      default() {
-        return shadeColor(this.primaryColor, 0.15)
-      }
-    },
-    weekdayTextColor: {
-      type: String,
-      default() {
-        return this.primaryTextColor
-      }
     },
     weekdayStyles: {
       type: Object
     },
     bodyStyles: {
-      type: Object,
-      default() {
-        return {
-          background: "white",
-          color: "black"
-        }
-      }
+      type: Object
     },
     activeDateBackgroundColor: {
       type: String,
@@ -144,7 +103,7 @@ export default {
     activeDateTextColor: {
       type: String,
       default() {
-        return this.primaryTextColor
+        return 'white'
       }
     },
     todayTextColor: {
@@ -180,18 +139,6 @@ export default {
         currentDay.add(1, 'days')
       }
       return days
-    },
-    allHeaderStyles() {
-      return Object.assign({
-        background: this.headerBackgroundColor,
-        color: this.headerTextColor,
-      }, this.headerStyles)
-    },
-    allWeekdayStyles() {
-      return Object.assign({
-        background: this.weekdayBackgroundColor,
-        color: this.weekdayTextColor,
-      }, this.weekdayStyles)
     }
   },
   methods: {
@@ -261,8 +208,6 @@ $black_15: rgba(0, 0, 0, 0.15);
 }
 .cd-weekdays {
   text-transform: uppercase;
-  background: $secondary_color;
-  color: $white;
   font-size: 0.9em;
   font-weight: bold;
   padding: 5px 15px;
@@ -277,8 +222,6 @@ $black_15: rgba(0, 0, 0, 0.15);
   }
 }
 header {
-  background: $primary_color;
-  color: $white;
   text-transform: uppercase;
   letter-spacing: 2px;
   padding: 1em;
