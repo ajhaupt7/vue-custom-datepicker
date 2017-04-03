@@ -12,7 +12,7 @@
 #### npm
 
 ```shell
-$ npm install vue-custom-datepicker
+$ npm install vue-custom-datepicker --save
 ```
 
 <img src="./assets/screenshot.png" width="300" />
@@ -24,6 +24,7 @@ $ npm install vue-custom-datepicker
 - Each element (i.e. header, body, weekdays, etc.) can be changed individually through the relevant style prop
 - Min and max dates can be set in the `limits` prop
 - Date can be formatted in any format that <a href="https://momentjs.com/">Moment</a> can handle
+- Font used in screenshot is <a href="https://fonts.google.com/specimen/Cabin">Cabin</a>
 
 ```html
 <template>
