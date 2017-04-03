@@ -54,7 +54,6 @@ import moment from 'moment'
 import {shadeColor} from './helpers'
 
 export default {
-  name: 'custom-datepicker',
   props: {
     initialDate: {
       type: String,
