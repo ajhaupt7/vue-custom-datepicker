@@ -15,6 +15,8 @@
 $ npm install vue-custom-datepicker
 ```
 
+![Screenshot](screenshot.png)
+
 ## Usage
 
 - Emits `dateSelected` event that returns the formatted date
