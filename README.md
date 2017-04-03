@@ -24,13 +24,11 @@ $ npm install vue-custom-datepicker
   <div id="app">
     <h2>{{ selectedDate }}</h2>
     <custom-datepicker 
-      @dateSelected              = "setDate($event)"
-      :initialDate               = "selectedDate" 
-      :primaryColor              = "primaryColor"
-      :primaryTextColor          = "primaryTextColor"
-      :todayTextColor            = "todayTextColor"
-      :activeDateTextColor       = "activeDateTextColor"
-      :activeDateBackgroundColor = "activeDateBackgroundColor"
+      @dateSelected  = "setDate($event)"
+      :date          = "selectedDate" 
+      :primaryColor  = "primaryColor"
+      :wrapperStyles = "wrapperStyles"
+      :limits        = "limits"
     />
   </div>
 </template>
@@ -38,6 +36,7 @@ $ npm install vue-custom-datepicker
 <script>
 import vue from 'vue'
 import CustomDatepicker from 'vue-custom-datepicker'
+import moment from 'moment'
 
 export default {
   name: 'app',
@@ -46,13 +45,13 @@ export default {
   },
   data () {
     return {
-      selectedDate: "2017-04-15",
+      selectedDate: moment().format('YYYY-MM-DD'),
       wrapperStyles: { width: '325px' },
-      primaryColor: "#fff",
-      primaryTextColor: "black",
-      todayTextColor: "#0918bc",
-      activeDateTextColor: "#fff",
-      activeDateBackgroundColor: "#0918bc"
+      primaryColor: "#0918bc",
+      limits: {
+        start: '2017-04-02',
+        end: '2017-05-22'
+      }
     }
   },
   methods: {
@@ -67,10 +66,25 @@ export default {
 ## API 
 
 ```javascript
-initialDate: {
+date: {
   type: String,
   default() {
     return moment()
+  }
+},
+limits: {
+  type: Object,
+  default() {
+    return {
+      start: null,
+      end: null
+    }
+  }
+},
+dateFormat: {
+  type: String,
+  default() {
+    return 'YYYY-MM-DD'
   }
 },
 primaryColor: {
@@ -79,58 +93,17 @@ primaryColor: {
     return "#ff5a5f"
   }
 },
-primaryTextColor: {
-  type: String,
-  default() {
-    return "white"
-  }
-},
 wrapperStyles: {
-  type: Object,
-  default() {
-    return {
-      width: '350px'
-    }
-  } 
-},
-headerBackgroundColor: {
-  type: String,
-  default() {
-    return this.primaryColor
-  }
-},
-headerTextColor: {
-  type: String,
-  default() {
-    return this.primaryTextColor
-  }
+  type: Object 
 },
 headerStyles: {
   type: Object
-},
-weekdayBackgroundColor: {
-  type: String,
-  default() {
-    return shadeColor(this.primaryColor, 0.15)
-  }
-},
-weekdayTextColor: {
-  type: String,
-  default() {
-    return this.primaryTextColor
-  }
 },
 weekdayStyles: {
   type: Object
 },
 bodyStyles: {
-  type: Object,
-  default() {
-    return {
-      background: "white",
-      color: "black"
-    }
-  }
+  type: Object
 },
 activeDateBackgroundColor: {
   type: String,
@@ -141,7 +114,7 @@ activeDateBackgroundColor: {
 activeDateTextColor: {
   type: String,
   default() {
-    return this.primaryTextColor
+    return 'white'
   }
 },
 todayTextColor: {

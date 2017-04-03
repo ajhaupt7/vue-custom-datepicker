@@ -115,8 +115,8 @@ export default {
   },
   data() {
     return {
-      displayDate: moment(this.date),
-      selectedDate: moment(this.date),
+      displayDate: this.getInitialDate(this.date),
+      selectedDate: this.getInitialDate(this.date),
       today: moment(),
       weekdayLabels: ['m', 't', 'w', 't', 'f', 's', 's']
     }
@@ -142,6 +142,9 @@ export default {
     }
   },
   methods: {
+    getInitialDate(date) {
+      return moment(date).isValid() ? moment(date) : moment()
+    },
     incrementMonth(e, num) {
       const transitions = document.querySelectorAll('[data-transition="month-change"]')
       const animation = num > 0 ? 'animate-next' : 'animate-prev'
