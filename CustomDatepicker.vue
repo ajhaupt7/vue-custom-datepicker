@@ -198,7 +198,7 @@ export default {
     incrementMonth(e, num) {
       const transitions = document.querySelectorAll('[data-transition="month-change"]')
       const animation = num > 0 ? 'animate-next' : 'animate-prev'
-      transitions.forEach(transition => transition.classList.add(animation))
+      transitions.forEach((transition, i) => transition.classList.add(animation))
       setTimeout(() => {
         this.displayDate = moment(this.displayDate).add(num, 'months')
       }, 200);
@@ -471,10 +471,10 @@ footer {
 }
 * {
   &.animate-next {
-    animation: monthChange 400ms cubic-bezier(0.6, 0.18, 0.42, 1.25) normal forwards;
+    animation: monthChange 400ms cubic-bezier(.66,-0.01,.69,1.23) normal forwards;
   }
   &.animate-prev {
-    animation: monthChange 400ms cubic-bezier(0.6, 0.18, 0.42, 1.25) reverse forwards;
+    animation: monthChange 400ms cubic-bezier(.66,-0.01,.69,1.23) reverse forwards;
   }
 }
 @keyframes pulse {
