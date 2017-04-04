@@ -27,7 +27,7 @@
             @click = "selectDate($event, day)"
           >
             <span>{{ day.format('D') }}</span>
-            <figure :style="{ background: activeDateBackgroundColor }"></figure>
+            <figure :style="{ background: activeDateBackgroundColor || primaryColor }"></figure>
           </button>
         </div>
       </section>
@@ -56,10 +56,7 @@ import {shadeColor} from './helpers'
 export default {
   props: {
     date: {
-      type: String,
-      default() {
-        return moment()
-      }
+      type: null
     },
     limits: {
       type: Object,
@@ -95,10 +92,7 @@ export default {
       type: Object
     },
     activeDateBackgroundColor: {
-      type: String,
-      default() {
-        return this.primaryColor
-      }
+      type: String
     },
     activeDateTextColor: {
       type: String,
@@ -107,10 +101,7 @@ export default {
       }
     },
     todayTextColor: {
-      type: String,
-      default() {
-        return this.primaryColor
-      }
+      type: String
     }
   },
   data() {
@@ -130,8 +121,8 @@ export default {
         const dayMoment = moment(currentDay)
         const properties = {
           disabled: this.isDisabled(dayMoment),
-          active: dayMoment.format(this.dateFormat) === moment(this.selectedDate).format(this.dateFormat),
-          today: dayMoment.format(this.dateFormat) === this.today.format(this.dateFormat)
+          active: dayMoment.format('MM-DD-YYYY') === moment(this.selectedDate).format('MM-DD-YYYY'),
+          today: dayMoment.format('MM-DD-YYYY') === this.today.format('MM-DD-YYYY')
         }
         
         const dayObj = Object.assign(dayMoment, properties)
@@ -162,8 +153,8 @@ export default {
     },
     dayStyle(day) {
       let styles = {}
-      if (day.today) styles = { color: this.todayTextColor }
-      if (day.active) styles = { color: this.activeDateTextColor }
+      if (day.today) styles = { color: this.todayTextColor || this.primaryColor }
+      if (day.active) styles = { color: this.activeDateTextColor || this.primaryColor }
 
       return styles
     },
