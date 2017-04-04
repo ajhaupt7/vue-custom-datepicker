@@ -19,6 +19,7 @@ $ npm install vue-custom-datepicker --save
 
 ## Usage
 
+- Interactive demo at https://ajhaupt7.github.io/vue-custom-datepicker-example/
 - Emits `dateSelected` event that returns the formatted date
 - Prop `primaryColor` will set the colors for the current date and the day selection (these can also be styled individually)
 - Each element (i.e. header, body, weekdays, etc.) can be changed individually through the relevant style prop
