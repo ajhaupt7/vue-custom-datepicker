@@ -20,7 +20,7 @@ $ npm install vue-custom-datepicker --save
 ## Usage
 
 - Emits `dateSelected` event that returns the formatted date
-- Prop `primaryColor` will set the colors for the current date and the day selection
+- Prop `primaryColor` will set the colors for the current date and the day selection (these can also be styled individually)
 - Each element (i.e. header, body, weekdays, etc.) can be changed individually through the relevant style prop
 - Min and max dates can be set in the `limits` prop
 - Date can be formatted in any format that <a href="https://momentjs.com/">Moment</a> can handle
@@ -73,61 +73,54 @@ export default {
 ## API 
 
 ```javascript
-date: {
-  type: String,
-  default() {
-    return moment()
-  }
-},
-limits: {
-  type: Object,
-  default() {
-    return {
-      start: null,
-      end: null
+props: {
+  date: {
+    type: null
+  },
+  limits: {
+    type: Object,
+    default() {
+      return {
+        start: null,
+        end: null
+      }
     }
-  }
-},
-dateFormat: {
-  type: String,
-  default() {
-    return 'YYYY-MM-DD'
-  }
-},
-primaryColor: {
-  type: String,
-  default() {
-    return "#ff5a5f"
-  }
-},
-wrapperStyles: {
-  type: Object 
-},
-headerStyles: {
-  type: Object
-},
-weekdayStyles: {
-  type: Object
-},
-bodyStyles: {
-  type: Object
-},
-activeDateBackgroundColor: {
-  type: String,
-  default() {
-    return this.primaryColor
-  }
-},
-activeDateTextColor: {
-  type: String,
-  default() {
-    return 'white'
-  }
-},
-todayTextColor: {
-  type: String,
-  default() {
-    return this.primaryColor
+  },
+  dateFormat: {
+    type: String,
+    default() {
+      return 'YYYY-MM-DD'
+    }
+  },
+  primaryColor: {
+    type: String,
+    default() {
+      return "#ff5a5f"
+    }
+  },
+  wrapperStyles: {
+    type: Object 
+  },
+  headerStyles: {
+    type: Object
+  },
+  weekdayStyles: {
+    type: Object
+  },
+  bodyStyles: {
+    type: Object
+  },
+  activeDateBackgroundColor: {
+    type: String
+  },
+  activeDateTextColor: {
+    type: String,
+    default() {
+      return 'white'
+    }
+  },
+  todayTextColor: {
+    type: String
   }
 }
 
