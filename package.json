@@ -1,7 +1,7 @@
 {
   "name": "vue-custom-datepicker",
   "description": "Customizable datepicker for Vue.js",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "Andrew Haupt <ajhaupt7@gmail.com>",
   "private": false,
   "scripts": {
