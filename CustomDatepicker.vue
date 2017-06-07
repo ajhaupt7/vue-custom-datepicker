@@ -23,8 +23,8 @@
             v-for  = "day,i in daysConstructor" 
             :key   = "i" 
             :style = "dayStyle(day)"
-            :class = "{ disabled: day.disabled, active: day.active }"
-            @click = "selectDate($event, day)"
+            :class = "calcDayClass(day)"
+            @click = "handleSelectDate($event, day)"
           >
             <span>{{ day.format('D') }}</span>
             <figure :style="{ background: activeDateBackgroundColor || primaryColor }"></figure>
@@ -57,6 +57,18 @@ export default {
   props: {
     date: {
       type: null
+    },
+    dateRangeStart: {
+      type: null
+    },
+    dateRangeEnd: {
+      type: null
+    },
+    dateRange: {
+      type: Boolean,
+      default() {
+        return false
+      }
     },
     limits: {
       type: Object,
@@ -106,10 +118,12 @@ export default {
   },
   data() {
     return {
-      displayDate: this.getInitialDate(this.date),
-      selectedDate: this.getInitialDate(this.date),
-      today: moment(),
-      weekdayLabels: ['m', 't', 'w', 't', 'f', 's', 's']
+      displayDate:       this.getInitialDate(this.date),
+      selectedDate:      this.getInitialDate(this.date),
+      selectedDateStart: this.getInitialDateRange(this.dateRangeStart || this.date),
+      selectedDateEnd:   null,
+      today:             moment(),
+      weekdayLabels:     ['m', 't', 'w', 't', 'f', 's', 's']
     }
   },
   computed: {
@@ -120,12 +134,15 @@ export default {
       for (let i = 0; i < 42; i++) {
         const dayMoment = moment(currentDay)
         const properties = {
-          disabled: this.isDisabled(dayMoment),
-          active: dayMoment.format('MM-DD-YYYY') === moment(this.selectedDate).format('MM-DD-YYYY'),
-          today: dayMoment.format('MM-DD-YYYY') === this.today.format('MM-DD-YYYY')
+          disabled          : this.isDisabled(dayMoment),
+          active            : this.isActiveDay(dayMoment),
+          activeRangeStart  : this.isActiveRangeDay(dayMoment, true),
+          activeRangeEnd    : this.isActiveRangeDay(dayMoment, false),
+          withinActiveRange : this.isWithinActiveRange(dayMoment),
+          today             : dayMoment.format('MM-DD-YYYY') === this.today.format('MM-DD-YYYY')
         }
-        
         const dayObj = Object.assign(dayMoment, properties)
+
         days.push(dayObj)
         currentDay.add(1, 'days')
       }
@@ -135,6 +152,51 @@ export default {
   methods: {
     getInitialDate(date) {
       return moment(date).isValid() ? moment(date) : moment()
+    },
+    getInitialDateRange(date, add) {
+      const initialDate = moment(date).isValid() ? moment(date) : moment();
+      return add ? initialDate.add(add, 'days') : initialDate;
+    },
+    isActiveDay(dayMoment) {
+      const formattedDate = dayMoment.format('MM-DD-YYYY'),
+            formattedSelectedDate = moment(this.selectedDate).format('MM-DD-YYYY');
+
+      return formattedDate === formattedSelectedDate && !this.dateRange;
+    },
+    isActiveRangeDay(dayMoment, isStart) {
+      const formattedDate = dayMoment.format('MM-DD-YYYY'),
+            formattedDateStart = moment(this.selectedDateStart).format('MM-DD-YYYY'),
+            formattedDateEnd = moment(this.selectedDateEnd).format('MM-DD-YYYY');
+
+      const eqSelectedDateStart = formattedDate === formattedDateStart && this.dateRange,
+            eqSelectedDateEnd = formattedDate === formattedDateEnd && this.dateRange;
+
+      return isStart ? eqSelectedDateStart : eqSelectedDateEnd;
+    },
+    isWithinActiveRange(dayMoment) {
+      const formattedDate = dayMoment.format('MM-DD-YYYY'),
+            formattedDateStart = moment(this.selectedDateStart).format('MM-DD-YYYY'),
+            formattedDateEnd = moment(this.selectedDateEnd).format('MM-DD-YYYY'); 
+
+      return dayMoment.diff(moment(this.selectedDateStart), 'days') >= 0 
+          && dayMoment.diff(moment(this.selectedDateEnd), 'days') <= 0 
+          && this.dateRange
+    }, 
+    isDisabled(dayMoment) {
+      const notWithinLimits = moment(this.limits.start).diff(dayMoment, 'days') > 0
+          || moment(this.limits.end).diff(dayMoment, 'days') < 0
+      const notCurrentMonth = dayMoment.month() !== this.displayDate.month()
+
+      return notWithinLimits || notCurrentMonth
+    },
+    calcDayClass(day) {
+      return {
+        disabled: day.disabled, 
+        active: day.active,
+        'active-range -start': day.activeRangeStart,
+        'active-range -end'  : day.activeRangeEnd,
+        'within-active-range': day.withinActiveRange
+      }
     },
     incrementMonth(e, num) {
       const transitions = document.querySelectorAll('[data-transition="month-change"]')
@@ -147,23 +209,32 @@ export default {
         transitions.forEach(transition => transition.classList.remove(animation))
       }, 400);
     },
+    handleSelectDate(e, day) {
+      this.dateRange ? this.selectDateRange(e, day) : this.selectDate(e, day);
+    },  
     selectDate(e, day) {
       if (!day.disabled) this.selectedDate = day
       this.$emit('dateSelected', this.selectedDate.format(this.dateFormat))
     },
+    selectDateRange(e, day) {
+      if (day.disabled) { return };
+      const dayDiff = day.diff(moment(this.selectedDateStart), 'days');
+      if (!this.selectedDateEnd && dayDiff > 0) {
+        this.selectedDateEnd = day;
+        const range = { start: this.selectedDateStart.format(this.dateFormat), end: this.selectedDateEnd.format(this.dateFormat)}
+        this.$emit('dateRangeSelected', range);
+      } else {
+        this.selectedDateStart = day;
+        this.selectedDateEnd = null;
+      }
+    },
     dayStyle(day) {
       let styles = {}
       if (day.today) styles = { color: this.todayTextColor || this.primaryColor }
-      if (day.active) styles = { color: this.activeDateTextColor || this.primaryColor }
+      if (day.active || day.activeRangeStart || day.activeRangeEnd) styles = { color: this.activeDateTextColor || this.primaryColor }
+      if (day.withinActiveRange) styles = { color: this.activeDateTextColor }
 
       return styles
-    },
-    isDisabled(dayMoment) {
-      const notWithinLimits = moment(this.limits.start).diff(dayMoment, 'days') > 0
-          || moment(this.limits.end).diff(dayMoment, 'days') < 0
-      const notCurrentMonth = dayMoment.month() !== this.displayDate.month()
-
-      return notWithinLimits || notCurrentMonth
     }
   }
 }
@@ -277,18 +348,39 @@ header {
       opacity: 0.4;
       cursor: default;
     }
-    &.active {
+    &.active, &.active-range {
       color: $white;
       > figure {
         background: $primary_color;
         transform: translate3d(-50%, -50%, 0) scale(1);
-        opacity: 1;
+        opacity: 1 !important;
+      }
+    }
+    &.within-active-range:not(.active-range) {
+      > figure {
+        opacity: 0.6;
+        transform: translate3d(-50%, -50%, 0) scale(1);
+        border-radius: 2px;
+      }
+    }
+    &.active-range {
+      &.-start {
+        > figure {
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+      }
+      &.-end {
+        > figure {
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+        }
       }
     }
     &:hover:not(.active):not(.disabled) {
       color: $white;
       > figure {
-          transform: translate3d(-50%, -50%, 0) scale(1);
+        transform: translate3d(-50%, -50%, 0) scale(1);
         opacity: 0.6;
       }
     }
