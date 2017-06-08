@@ -241,7 +241,7 @@ export default {
   }
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 $primary_color: #ff5a5f;
 $secondary_color: #ff7478;
 $white: white;
