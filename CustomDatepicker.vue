@@ -120,8 +120,8 @@ export default {
     return {
       displayDate:       this.getInitialDate(this.date),
       selectedDate:      this.getInitialDate(this.date),
-      selectedDateStart: this.getInitialDateRange(this.dateRangeStart || this.date),
-      selectedDateEnd:   null,
+      selectedDateStart: this.dateRangeStart ? this.getInitialDateRange(this.dateRangeStart) : null,
+      selectedDateEnd:   this.dateRangeEnd ? this.getInitialDateRange(this.dateRangeEnd) : null,
       today:             moment(),
       weekdayLabels:     ['m', 't', 'w', 't', 'f', 's', 's']
     }
@@ -221,12 +221,14 @@ export default {
       const dayDiff = day.diff(moment(this.selectedDateStart), 'days');
       if (!this.selectedDateEnd && dayDiff > 0) {
         this.selectedDateEnd = day;
-        const range = { start: this.selectedDateStart.format(this.dateFormat), end: this.selectedDateEnd.format(this.dateFormat)}
-        this.$emit('dateRangeSelected', range);
       } else {
         this.selectedDateStart = day;
         this.selectedDateEnd = null;
       }
+      const start = this.selectedDateStart ? this.selectedDateStart.format(this.dateFormat) : null,
+            end   = this.selectedDateEnd ? this.selectedDateEnd.format(this.dateFormat) : null,
+            range = { start: start, end: end };
+      this.$emit('dateRangeSelected', range);
     },
     dayStyle(day) {
       let styles = {}
@@ -239,7 +241,7 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 $primary_color: #ff5a5f;
 $secondary_color: #ff7478;
 $white: white;
