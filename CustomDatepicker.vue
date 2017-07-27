@@ -3,13 +3,13 @@
     <div class="cd-body-wrapper">
       <header :style="headerStyles">
         <button>
-          <figure class="chevron left" @click="incrementMonth($event, -1)"></figure>
+          <figure class="chevron left" @click.stop.prevent="incrementMonth($event, -1)"></figure>
         </button> 
         <article data-transition="month-change">
           <span>{{ displayDate.format('MMMM') }}</span> <span>{{ displayDate.format('Y') }}</span>
         </article>
         <button>
-          <figure class="chevron right" @click="incrementMonth($event, 1)"></figure>
+          <figure class="chevron right" @click.stop.prevent="incrementMonth($event, 1)"></figure>
         </button>
       </header>
       <section>
@@ -24,7 +24,7 @@
             :key   = "i" 
             :style = "dayStyle(day)"
             :class = "calcDayClass(day)"
-            @click = "handleSelectDate($event, day)"
+            @click.stop.prevent = "handleSelectDate($event, day)"
           >
             <span>{{ day.format('D') }}</span>
             <figure :style="{ background: activeDateBackgroundColor || primaryColor }"></figure>
