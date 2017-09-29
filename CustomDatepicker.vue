@@ -157,7 +157,7 @@ export default {
   computed: {
     daysConstructor() {
       let days = [],
-          currentDay = moment(this.displayDate).startOf('month').day(1)
+          currentDay = moment(this.displayDate).startOf('month').day(-6)
 
       for (let i = 0; i < 42; i++) {
         const dayMoment = moment(currentDay)
